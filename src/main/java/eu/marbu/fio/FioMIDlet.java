@@ -26,21 +26,67 @@ import javax.microedition.midlet.MIDlet;
  */
 public class FioMIDlet extends MIDlet implements CommandListener {
 
+	// length of FIO API token
+	public static final int API_TOKEN_LEN = 64;
+
 	/*
 	 * GUI components
 	 */
 	private Display display;
 
-	// Account selection form
-	private Form accountsForm;
+	// Account list screen
+	private List accountList = new List("Accounts", Choice.IMPLICIT);
+	private Command selectCmd = new Command("Select", Command.ITEM, 0);
+	private Command addCmd = new Command("Add", Command.SCREEN, 1);
+	private Command delCmd = new Command("Delete", Command.ITEM, 1);
+	private Command renameCmd = new Command("Rename", Command.ITEM, 1);
+	private Command exitCmd = new Command("Exit", Command.EXIT, 1);
+
+	// Add Account screen
+	private Form addAccountForm = new Form("Add Account");
+	private TextField accountNameField = new TextField("Name:", "", 20, TextField.ANY);
+	private TextField accountTokenField = new TextField("FIO API Token:", "", API_TOKEN_LEN, TextField.SENSITIVE);
+	private Command okCmd = new Command("Ok", Command.OK, 0);
+	private Command cancelCmd = new Command("Cancel", Command.CANCEL, 1);
+
+	// Rename Account screen
+	private Form renameAccountForm = new Form("Rename Account");
+	private TextField accountReNameField = new TextField("New name:", "", 20, TextField.ANY);
+
+	// Account screen
+	private Form accountForm = new Form("Account");
+	private StringItem accountNameItem = new StringItem("Name", null);
+	private Command backCmd = new Command("Back", Command.BACK, 1);
 
 	/**
 	 * Constructor - initializes GUI components.
 	 */
 	public FioMIDlet() {
-		// Account selection form
-		accountsForm = new Form("Accounts");
-		accountsForm.setCommandListener(this);
+		// Account list screen
+		accountList.addCommand(addCmd);
+		accountList.setSelectCommand(selectCmd);
+		// accountList.addCommand(delCmd);
+		// accountList.addCommand(renameCmd);
+		accountList.addCommand(exitCmd);
+		accountList.setCommandListener(this);
+
+		// Add Account screen
+		addAccountForm.append(accountNameField);
+		addAccountForm.append(accountTokenField);
+		addAccountForm.addCommand(okCmd);
+		addAccountForm.addCommand(cancelCmd);
+		addAccountForm.setCommandListener(this);
+
+		// Rename Account screen
+		renameAccountForm.append(accountReNameField);
+		renameAccountForm.addCommand(okCmd);
+		renameAccountForm.addCommand(cancelCmd);
+		renameAccountForm.setCommandListener(this);
+
+		// Account screen
+		accountForm.append(accountNameItem);
+		accountForm.addCommand(backCmd);
+		accountForm.setCommandListener(this);
 	}
 
 	/**
@@ -48,7 +94,7 @@ public class FioMIDlet extends MIDlet implements CommandListener {
 	 */
 	public void startApp() {
 		display = Display.getDisplay(this);
-		display.setCurrent(accountsForm);
+		display.setCurrent(accountList);
 	}
 
 	/**
@@ -70,5 +116,47 @@ public class FioMIDlet extends MIDlet implements CommandListener {
 	 *      javax.microedition.lcdui.Displayable)
 	 */
 	public void commandAction(Command aCmd, Displayable aDisp) {
+		if (aDisp == accountList) {
+			if (aCmd == selectCmd) {
+				accountNameItem.setText(accountList.getString(accountList.getSelectedIndex()));
+				display.setCurrent(accountForm);
+			} else if (aCmd == delCmd) {
+				accountList.delete(accountList.getSelectedIndex());
+				if (accountList.size() == 0) {
+					accountList.removeCommand(delCmd);
+					accountList.removeCommand(renameCmd);
+				}
+			} else if (aCmd == renameCmd) {
+				int renameIndex = accountList.getSelectedIndex();
+				// use the current name as a starting point
+				accountReNameField.setString(accountList.getString(renameIndex));
+				display.setCurrent(renameAccountForm);
+			} else if (aCmd == exitCmd) {
+				notifyDestroyed();
+			} else if (aCmd == addCmd) {
+				display.setCurrent(addAccountForm);
+			}
+		} else if (aDisp == addAccountForm) {
+			if (aCmd == okCmd) {
+				accountList.append(accountNameField.getString(), null);
+				if (accountList.size() == 1) {
+					accountList.addCommand(delCmd);
+					accountList.addCommand(renameCmd);
+				}
+			}
+			display.setCurrent(accountList);
+			accountNameField.setString("");
+			accountTokenField.setString("");
+		} else if (aDisp == renameAccountForm) {
+			if (aCmd == okCmd) {
+				int renameIndex = accountList.getSelectedIndex();
+				accountList.set(renameIndex, accountReNameField.getString(), null);
+			}
+			display.setCurrent(accountList);
+		} else if (aDisp == accountForm) {
+			if (aCmd == backCmd) {
+				display.setCurrent(accountList);
+			}
+		}
 	}
 }
