@@ -29,6 +29,9 @@ public class FioMIDlet extends MIDlet implements CommandListener {
 	// length of FIO API token
 	public static final int API_TOKEN_LEN = 64;
 
+	// max. length of Account name
+	public static final int NAME_LEN = 20;
+
 	/*
 	 * GUI components
 	 */
@@ -44,14 +47,14 @@ public class FioMIDlet extends MIDlet implements CommandListener {
 
 	// Add Account screen
 	private Form addAccountForm = new Form("Add Account");
-	private TextField accountNameField = new TextField("Name:", "", 20, TextField.ANY);
+	private TextField accountNameField = new TextField("Name:", "", NAME_LEN, TextField.ANY);
 	private TextField accountTokenField = new TextField("FIO API Token:", "", API_TOKEN_LEN, TextField.SENSITIVE);
 	private Command okCmd = new Command("Ok", Command.OK, 0);
 	private Command cancelCmd = new Command("Cancel", Command.CANCEL, 1);
 
 	// Rename Account screen
 	private Form renameAccountForm = new Form("Rename Account");
-	private TextField accountReNameField = new TextField("New name:", "", 20, TextField.ANY);
+	private TextField accountReNameField = new TextField("New name:", "", NAME_LEN, TextField.ANY);
 
 	// Account screen
 	private Form accountForm = new Form("Account");
