@@ -17,8 +17,11 @@ the project, run:
 
 	$ mvn clean package
 
-This default build uses Microemulator API implementation to simplify the build
-process, but it's only MIDP-2.0 implementation.
+This default build uses
+[Microemulator](https://sourceforge.net/projects/microemulator/)
+API implementation to simplify the build process, but it's only
+[MIDP-2.0](http://docs.oracle.com/javame/config/cldc/ref-impl/midp2.0/jsr118/)
+implementation.
 
 ### How to run it in the Microemulator
 
